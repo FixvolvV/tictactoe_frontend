@@ -1,0 +1,97 @@
+:root {
+    --font-family: "Monocraft", sans-serif;
+    --second-family: "8bitoperator JVEC", sans-serif;
+}
+
+.body {
+    margin: 0px;
+    background: linear-gradient(180deg, #2c4420 0%, #000 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5%;
+    padding-top: 1vh;
+}
+
+button { border: 0px solid #000 }
+
+.body .element{
+    background: #343434;
+    margin: 0px;
+    padding: 0px;
+}
+
+#Back{
+    border-radius: 35px;
+    width: 139px;
+    height: 880px;
+}
+
+#Profile{
+    border-radius: 35px;
+    width: 908px;
+    height: 800px;
+}
+
+.back{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile{
+    display: inline-block;
+}
+
+.profile img{
+    width: 250px;
+    height: 250px;
+    float: right;
+    margin-right: 5%;
+}
+
+.profile h3{
+    text-align: center;
+
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 40px;
+    letter-spacing: -0.05em;
+    color: #caff8a;
+
+    flex: 1 1 100%;
+    margin: 15px;
+    padding: 0px;
+}
+
+.profile div{
+    max-width: 60%;
+}
+
+.profile .first{
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: -0.05em;
+    color: #caff8a;
+
+    max-width: 60%;
+    margin: 20px;
+    margin-left: 5%;
+    padding: 0px;
+    height: 20px;
+}
+
+.profile p{
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 25px;
+    letter-spacing: -0.03em;
+    color: #fff; 
+
+    max-width: 60%;
+    margin: 5px;
+    margin-left: 5%;
+    padding: 0px;
+    height: 20px;
+}

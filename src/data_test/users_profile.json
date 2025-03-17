@@ -1,0 +1,58 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "nickname": "FixV",
+            "games": {
+                "total": 500,
+                "wins": 250,
+                "loses": 250
+            }
+        },
+        {
+            "id": 2,
+            "nickname": "admin",
+            "games": {
+                "total": 9999,
+                "wins": 9999,
+                "loses": 0
+            }
+        },
+        {
+            "id": 3,
+            "nickname": "bogdan",
+            "games": {
+                "total": 265,
+                "wins": 111,
+                "loses": 154
+            }
+        },
+        {
+            "id": 4,
+            "nickname": "denicenca",
+            "games": {
+                "total": 3,
+                "wins": 2,
+                "loses": 1
+            }
+        },
+        {
+            "id": 5,
+            "nickname": "ebanutyu",
+            "games": {
+                "total": 100000,
+                "wins": 50000,
+                "loses": 50000
+            }
+        },
+        {
+            "id": 6,
+            "nickname": "Chto?",
+            "games": {
+                "total": 0,
+                "wins": 0,
+                "loses": 0
+            }
+        }
+    ]
+}

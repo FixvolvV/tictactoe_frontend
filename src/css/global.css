@@ -1,0 +1,9 @@
+:root {
+    --font-family: "Monocraft", sans-serif;
+    --second-family: "8bitoperator JVEC", sans-serif;
+}
+
+body {
+    margin: 0px;
+    background: #000000;
+}
