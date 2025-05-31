@@ -16,7 +16,7 @@ const now = ref(null);
 const total = ref(null);
 const openregister = ref(false);
 const openlogin = ref(false);
-const patchs = ref([]);
+const patchs = ref([{idpatch: 1, numberpatch: "0.0.0"}, {idpatch: 1, numberpatch:"0.0.0"}] );
 
 // Управляем состоянием окон
 const isLoginOpen = ref(false);
@@ -39,10 +39,10 @@ const closedmodal = () => {
 };
 
 onMounted(async () => {
-  const response = await api.get('/get/global');
-  now.value = response.data.now
-  total.value = response.data.total
-  await userStore.getSelf()
+  // const response = await api.get('/get/global');
+  // now.value = response.data.now
+  // total.value = response.data.total
+  // await userStore.getSelf()
 
 })
 
@@ -50,49 +50,51 @@ onMounted(async () => {
 
 
 <template>
- 
- <div class="body">
+  <div class="body">
+    <header>
+      <img class="element" src="../assets/logo.png"/>
+      <h1 class="element">TicTacToe</h1>
+      <h2 class="element"><button @click="router.push('/lobby')">Play</button></h2>
+      <h2 class="element"><button @click="router.push('/leadersboard')">Leaderboard</button></h2>
+      <img  id="Account" class="element" @click="openedregister" src="../assets/account_icon_null.png"/>
+    </header>
 
-  <div id="Header" class="header">
-      <img id="Logo" class="element" src="../assets/logo.png">
-      <h1 id="Name" class="element"> TicTacToe </h1>
-      <button id="BPlay" class="element" @click="router.push('/lobby')"> Play </button>
-      <button id="BLeadersboard" class="element" @click="router.push('/leadersboard')"> Leadersboard </button>
-      <button v-if="!userStore.token" id="BAccount" class="element" @click="openedregister">Account<img src="../assets/account_icon_null.png"></button>
-      <button v-if="userStore.token" id="BAccount" class="element" @click="router.push(`/profile/${userStore.user}`)">You're logged in<img src="../assets/account_icon_full.png"></button>
-  </div>
 
-    <div class="info">
-      
-      <div id="General" class="general">
-        <div><span class="static">Now Play:</span> {{ now }} </div>
-        <div><span class="static">Total Games:</span> {{ total }} </div>
-      </div>
 
-      <div id="Siteinfo" class="siteinfo">
-        <h2>Site Info</h2>
-        <div class="line"></div>
-        <div class="info1">Сайт находиться в разработке !!!</div>
-        <div class="info2">Заметили баг? :) <br/> Зайдите в дискорд и сообщите о нем!</div>
-        <div class="info3">Сайт посвященный известной популярной игре “крестики нолики” но в их бесконечной форме.</div>
-        <div class="info3">Для того что бы победить вам нужно собрать 5 крестов или ноликов в ряд, на бесконечном поле.</div>
-      </div>
+    <div class="flex-container">
+      <div><h2>Now Play: <span style="color: #fff">{{now}}</span></h2> </div>
 
-      <div id="Pathnotes" class="pathnotes">
-        <h2>Path notes</h2>
+      <div><h2>Total Games: <span style="color: #fff">{{total}}</span></h2> </div>
+    </div>
+
+    <div class="flex-info-container">
+        <div class="info">
+          <h3>Site Info</h3>
+
+          <p>The website is under development... Did you notice the <span style="color:#ff5e5e">bug</span>?)
+            Go to discord and <span style="color:#ff5e5e">report it</span> to the developer. Website dedicated to the famous popular game
+“tic-tac-toe” but in their infinite form. In order to win you need to collect 5 crosses or
+zeros in a row, on an infinite field.</p>
+        </div>
+        <div class="patchs"> <h3>Patch Notes</h3>
         <Patch v-for="el in patchs" :idpatch = "el.idpatch" :numberpatch="el.numberpatch" />
-      </div>
+        </div>
     </div>
 
-    <div id="Footer" class="footer">
-      <img src="../assets/github_logo.png">
-      <img src="../assets/discord_logo.png">
-    </div>
+    <footer>
+      <img  id="refLogo"src="../assets/disLogo.png"/>
+      <img id="refLogo"src="../assets/gitLogo.png"/>
+    </footer>
+
+
+    <Register v-if="isRegisterOpen" :closedmodal="closedmodal" :openedlogin="openedlogin" />
+
+
+  <Login v-if="isLoginOpen" :closedmodal="closedmodal" :openedregister="openedregister" />
+
 
   </div>
 
-  <Register v-if="isRegisterOpen" :closedmodal="closedmodal" :openedlogin="openedlogin" />
-  <Login v-if="isLoginOpen" :closedmodal="closedmodal" :openedregister="openedregister" />
 
 </template>
 

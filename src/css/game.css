@@ -52,18 +52,14 @@
 .timer > h3{
     margin: 5px;
     padding: 0px;
-    font-weight: 400;
     font-size: 45px;
-    letter-spacing: -0.05em;
     color: #5f37a4;
 }
 
 .timer > div{
     margin-top: 15px;
     padding: 0px;
-    font-weight: 400;
     font-size: 45px;
-    letter-spacing: -0.05em;
     color: #fff;
 }
 
@@ -125,9 +121,7 @@
 }
 
 .giveup{
-    font-weight: 400;
     font-size: 30px;
-    letter-spacing: -0.05em;
     color: #ff5e5e;
 
     border-radius: 25px;
@@ -156,29 +150,21 @@
 
 .symbol{
     margin-top: 15px;
-    font-weight: 400;
     font-size: 15px;
-    letter-spacing: -0.05em;
     color: #fff;
 }
 
 .timeturn{
     margin-top: 15px;
-    font-weight: 400;
     font-size: 15px;
-    letter-spacing: -0.05em;
     color: #fff;
 }
 
 .symbol_1{
-    font-weight: 400;
     font-size: 40px;
-    letter-spacing: -0.05em;
 }
 
 .timeturn_1{
     align-self: baseline;
-    font-weight: 400;
     font-size: 30px;
-    letter-spacing: -0.05em;
 }

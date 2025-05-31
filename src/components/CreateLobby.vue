@@ -52,7 +52,7 @@ const handleCreateLobby = async () => {
 
                 <h3 class="title">Create Lobby</h3>
                 <div class="data_input">
-                    <div class="input_text"> Lobby Name: </div> <input id="name" v-model="name">
+                    <div class="input_text"> Name: </div> <input id="name" placeholder="Enter name lobby" v-model="name">
                 </div>
 
                 <button id="confirm" @click="handleCreateLobby"> Create </button>
@@ -72,18 +72,28 @@ const handleCreateLobby = async () => {
     display: flex;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.8);
-    padding: 15px;
 }
 
-.modal_container{
+.modal_container {
     position: relative;
     margin: auto;
     width: 700px;
     height: 510px;
-    border-radius: 35px;
-    border: 3px dashed #fff;
-    background: #272727;
-    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: black; /* Черный фон для контраста */
+}
+
+/* Создаем псевдоэлемент для градиентной границы */
+.modal_container::before {
+    content: '';
+    position: absolute;
+    top: -6px; /* Смещение вверх */
+    left: -6px; /* Смещение влево */
+    right: -6px; /* Смещение вправо */
+    bottom: -6px; /* Смещение вниз */
+    border-radius: 36px; /* Больше радиуса, чтобы граница была видна */
+    background: linear-gradient(to right, #ff5e5e, #2ec0ff); /* Градиент */
+    z-index: -1; /* Псевдоэлемент находится под основным элементом */
 }
 
 .modal_body{
@@ -91,7 +101,6 @@ const handleCreateLobby = async () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 25px 0px;
 }
 
 #exit{
@@ -99,24 +108,27 @@ const handleCreateLobby = async () => {
     border: none;
     background-color: transparent;
     cursor: pointer;
-    font-size: 30px;
+    font-size: 45px;
     color: #fff;
     padding: 0;
-    top: 5px;
-    right: 15px;
+    top: 35px;
+    right: 35px;
 }
+
 
 .title {
     font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 35px;
-    color: #fff;
     text-align: center;
-    margin: 0;
-    margin-bottom: 75px;
+    font-size: 45px;
+    margin: 35px 0;
     padding: 0px;
     width: 100%;
+    background-image: linear-gradient(to right, #FF5E5E, #2EC0FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
+
 
 .data_input{
     display: flex;
@@ -124,45 +136,51 @@ const handleCreateLobby = async () => {
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: center;
+    margin-top: 40px;
 }
 
 .input_text {
     font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 30px;
-    color: #fff;
+    font-size: 40px;
+    color: #2ec0ff;
     width: 30%;
 }
 
 #name{
     font-family: var(--font-family);
-    border: 3px solid #fff;
+    font-size: 25px;
     width: 40%;
     height: 25px;
-    background: #272727;
+    text-align:center;
+    border: 3px solid #fff;
+    border-radius: 20px;
+    background: none;
     color: #fff;
+
+    
 }
+#name::placeholder{
+        color: #fff;
+    opacity: 0.65;
+    }
 
 #confirm{
-    border: 3px solid #fff;
+    font-family: var(--font-family);
+    font-size: 25px;
+    text-align:center;
     width: 200px;
     height: 40px;
-    background: #272727;
-
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 20px;
-    letter-spacing: -0.03em;
-    color: #fff;
-
+    border: 3px solid #fff;
+    border-radius: 20px;
+    background: none;
+    margin-top: 50px;
+    color: #FF5E5E;
     cursor: pointer;
 }
 
 .error{
-    font-family: var(--second-family);
-    font-weight: 400;
+    font-family: var(--font-family);
     font-size: 15px;
-    letter-spacing: -0.03em;
     color: #ff5e5e;
 }
 

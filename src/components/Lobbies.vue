@@ -50,7 +50,7 @@ onMounted( async () => {
 
     <div class="lobby_container" @click="clickHandler">
         <div class="namelobby">{{name}}</div>
-        <div class="ownerlobby">Owner: {{_owner}}</div>
+        <div class="ownerlobby">Owner: {{owner}}</div>
         <div class="gamemode">Mode: {{gamemode}}</div>
     </div>
 
@@ -59,10 +59,9 @@ onMounted( async () => {
 <style scoped>
 
 .lobby_container{
-    background: #7f7f7f;
+    background: rgba(52,52,52, .5);
     border-radius: 25px;
-    margin: 15px;
-    padding: 15px;
+    margin: 0px 35px 20px 35px;
     width: 90%;
     height: 115px;
 }
@@ -70,19 +69,17 @@ onMounted( async () => {
 .namelobby{
     position: relative;
     font-family: var(--font-family);
-    font-weight: 400;
     font-size: 40px;
-    letter-spacing: -0.05em;
-    color: #CAFF8A;
+    color: #2ec0ff;
     top: 15px;
+    left: 20px;
 }
 
 .ownerlobby{
     position: static;
     font-family: var(--font-family);
-    font-weight: 400;
     font-size: 35px;
-    letter-spacing: -0.05em;
+    margin-right: 55px;
     color: #fff;
     text-align: right;
 }
@@ -90,9 +87,8 @@ onMounted( async () => {
 .gamemode{
     position: relative;
     font-family: var(--font-family);
-    font-weight: 400;
+    margin-left: 20px;
     font-size: 25px;
-    letter-spacing: -0.05em;
     color: #fff;
     bottom: 10px;
 }

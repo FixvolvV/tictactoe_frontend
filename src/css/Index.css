@@ -1,222 +1,177 @@
 :root {
-    --font-family: "Monocraft", sans-serif;
-    --second-family: "8bitoperator JVEC", sans-serif;
+    --font-family: "VT323";
 }
 
+*{
+    font-family: var(--font-family);
+    background: none;
+    border:  none;
+}
 .body {
-    margin: 0px;
-    background: #000;
-}
+    
+  /* Устанавливаем градиентный фон */
+  background: linear-gradient(
+    to bottom right,
+    #0e3648, /* Темно-синий в левом верхнем углу */
+    #000, /* Черный в центре */
+    #000,
+    #431616  /* Темно-красный в правом нижнем углу */
+  );
 
-.header{
+  /* Делаем фон захватывающим всю страницу */
+  background-size: cover;
+  background-position: center;
+
+  /* Убираем стандартные отступы и маргины */
+  margin: 0;
+  padding: 0;
+
+
+  height: 100vh; /* Полная высота экрана */
+}
+header{
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 120px;
-    background-image: url(../assets/difys_logo_big.png);
-}
-
-.header > .element{
-    margin-top: 10px;
-    margin-bottom: 0px;
-    padding: 0%;
-    flex: 0 1 250px;
-
-}
-
-#Name{
-    flex-basis: 250px;
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 50px;
-    letter-spacing: -0.03em;
-    background: linear-gradient(135deg, #ff5e5e 0%, #2ec0ff 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-#Logo{
-    margin-left: 1%;
-    margin-right: 1%;
-    max-width: 50px;
-    height: 50px;
-}
-
-.header button{
-    font-family: var(--font-family);
-    font-weight: 600;
-    font-size: 30px;
-    text-align: center;
-    color: #fff;
-    border: 0px solid #000;
-}
-
-#BPlay{
-    margin-top: 25px;
-    background: #343434;
-}
-
-#BLeadersboard{
-    margin-top: 25px;
-    background: #343434;
-    letter-spacing: -0.03em;
-}
-
-#BAccount{
-    max-width: 180px;
-    margin-left: auto;
-    background: #343434;
-    font-weight: 300;
-    font-style: italic;
-    font-size: 25px;
-}
-#BAccount img{
-    width: 25px;
-    height: 25px;
-}
-
-.info{
-    display: flex;
-    flex-wrap: wrap;
     flex-direction: row;
-    justify-content: center;
-    padding-left: 10%;
-    padding-right: 10%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    flex: 1 0 100%;
-    gap: 23px 10%;
-}
-
-.info .general{
-    flex-grow: 2;
-    height: 130px;
-}
-.info .siteinfo{
-    flex-grow: 1;
-    max-width: 780px;
-}
-.info .pathnotes{
-    flex-grow: 1;
-    max-width: 480px;
-}
-
-.general{
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    border-radius: 30px;
-    background: #343434;
-}
-
-.general .static{
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 45px;
-    letter-spacing: -0.03em;
-    background: linear-gradient(135deg, #ff5e5e 0%, #2ec0ff 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.general div{
-    font-family: var(--font-family);
-    font-weight: 600;
-    font-size: 45px;
-    letter-spacing: -0.03em;
     color: #fff;
-}
-
-.siteinfo{
-    display: flex;
-    flex-direction: column;
-    justify-items: center;
-    align-items: center;
-    height: 520px;
-    background: #343434;
-    border-radius: 30px 30px 0px 0px;
-}
-
-.siteinfo h2{
-    font-family: var(--font-family);
-    font-weight: 600;
-    font-size: 30px;
-    letter-spacing: -0.03em;
-    color: #fff;
-    height: 58px;
-    margin-top: 10px;
-    margin-bottom: 0px;
-}
-
-.siteinfo .line {
-    height: 0px;
+    justify-content: space-around;
     width: 100%;
-    border-top: 3px solid #ffffff;
-    margin: 0%;
-  }
-
-.siteinfo div{
-    font-family: var(--second-family);
-    font-weight: 400;
-    font-size: 40px;
-    letter-spacing: -0.03em;
-    text-align: center;
-    color: #fff;
-    margin-top: 15px;
-    margin-bottom: 8px;
-}
-
-.siteinfo .info1 {
-    color: #ff5e5e;
-}
-.siteinfo .info2{
-    font-weight: 400;
-    font-size: 25px;
-    letter-spacing: -0.01em;
-    color: #fff;
-}
-.siteinfo .info3{
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 117%;
-    color: #fff;
-}
-
-.pathnotes{
-    display: flex;
-    flex-direction: column;
+    background: rgba(0, 0, 0, 0.8);
     align-items: center;
-    height: 520px;
-    background: #343434;
-    border-radius: 30px 30px 0px 0px;
+    gap: 10%;
+    height: 10vh;
+
+    h1{
+        font-size: 55px;
+        margin: 0;
+    }
+    h2{
+        margin: 0;
+    }
+    .element{
+        flex: 1 2 10vw;
+        text-align: center;
+        
+    }
+    
+    img{
+        max-height: 50px;
+        max-width: 50px;
+        flex-shrink: 0;
+        margin: 0 1% 0 1%;
+        
+    }
+    #Account{
+        cursor: pointer;
+        transition: 1.2s;
+        border-radius: 15px;
+    
+    }
+    #Account:hover{
+        background: #9d9c9c;
+        
+    }
+
+    button{
+        max-width: 165px;
+        max-height: 50px;
+        color: #fff;
+        font-size: 35px;
+        cursor: pointer;
+        border-radius: 15px;
+        transition: 1.2s;
+    }
+    button:hover {
+            color: #000;
+            background: #fff;
+            transform: scale(1.2);
+            
+        }
 }
 
-.pathnotes h2{
-    font-family: var(--font-family);
-    font-weight: 600;
-    font-size: 30px;
-    letter-spacing: -0.03em;
-    color: #fff;
-    margin-top: 15px;
-    margin-bottom: 0px;
-}
-
-.footer{
+.flex-container{
+    
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: flex-end;
-    height: 80px;
-    background-image: url(../assets/difys_logo_180.png);
+    text-align: center;
+    font-size: 35px;
+    margin: 5vh 15% 0 15%;
+    background-image: linear-gradient(to right, #FF5E5E, #2EC0FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    justify-content: space-around;
+    align-items: center;
+
+    max-width: 100%;
+
+    border:  2px #6d6a6a solid;
+    border-radius: 15px 15px 0 0;
+
+    height: 15vh;
 }
 
-.footer img{
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    width: 50px;
-    height: 50px;
+.flex-info-container{
+    margin: 5vh 15% 0 15%;
+    display: flex;
+    color: #fff;
+    justify-content: space-between;
+    flex-direction: row;
+    gap: 5%;
+    height: 50vh;
+
+    .info{
+    border: 2px #6d6a6a solid;
+    border-radius: 0 0 0 15px;
+    flex-grow: 2;
+    white-space: normal;
+    flex-basis: 70%;
+    
+}
+
+    .patchs{
+    border: 2px #6d6a6a solid;
+    border-radius: 0 0 15px 0;
+    flex-grow: 1;
+    flex-basis: 30%;
+    
+}
+    
+    h3{
+        font-size: 35px;
+        text-decoration: underline;
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    p{
+        font-size: 25px;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    
+}
+
+
+
+footer{
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.8);
+    gap: 50px;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 5vh 0 0     0;
+    height: 10vh;
+
+    img{
+        max-width: 45px;
+        max-height: 45px;
+        margin-right: 15px;
+        border-radius: 15px;
+        transition: 1.2s;
+    }
+
+    #refLogo:hover{
+         background: rgba(159, 153, 153, 0.8)
+    }
+
 }

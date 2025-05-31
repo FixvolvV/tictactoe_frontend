@@ -32,29 +32,33 @@ defineProps({
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #282828;
-    border-radius: 15px;
+    background: rgba(46,192,255, .65);
+    border-radius: 15px 0px 15px 15px;
     margin: 15px;
     padding: 5px;
     width: 80%;
     height: 115px;
+    transition: 1.2s;
+    cursor: pointer;
+}
+.patch_container:hover{
+  background: rgba(46,192,255, .85);
+  transform: scale(1.05);
 }
 
 .patch_number{
     font-family: var(--font-family);
-    font-weight: 200;
-    font-style: italic;
-    font-size: 25px;
-    letter-spacing: -0.03em;
-    color: #fff;
+    font-size: 30px;
+    text-align:center;
+    color: #ffff;
     margin: 5px;
 }
 
 .click{
     font-family: var(--font-family);
     font-weight: 600;
-    font-size: 20px;
-    color: #2ec0ff;
+    font-size: 25px;
+    color: #ff5e5e;
     margin: 5px;
 }
 

@@ -31,7 +31,7 @@ defineProps({
 
     <div class="leaders_container">
         <div class="container1">
-            <img v-if="place in [1, 2, 3, 4]" src="../assets/corona.png">
+            <img v-if="place in [1, 2, 3, 4]" src="../assets/crown.png">
     
             <div v-if="place in [1, 2, 3, 4]" class="golden place">{{place}}</div>
             <div v-else class="place">{{place}}</div>
@@ -43,8 +43,8 @@ defineProps({
         </div>
         
         <div class="container3">
-            <div class="wins">Wins: {{wins}}</div>
-            <div class="loses">Loses: {{loses}}</div>
+            <div class="stat"><span style="color:#2ec0ff">Victory:</span> {{wins}}</div>
+            <div class="stat"><span style="color:#ff5e5e">Defeat:</span> {{loses}}</div>
         </div>
     </div>
 
@@ -57,7 +57,7 @@ defineProps({
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    background: #7f7f7f;
+    background: rgba(52,52,52, .5);
     border-radius: 25px;
     margin: 15px;
     padding: 15px;
@@ -68,7 +68,7 @@ defineProps({
 .container1{
     flex: 2;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
 }
 
@@ -92,39 +92,21 @@ img{
 
 .place{
     font-family: var(--font-family);
-    font-weight: 400;
     font-size: 50px;
-    letter-spacing: -0.05em;
     color: #fff;
     margin: 10px;
 }
 
 .username{
     font-family: var(--font-family);
-    font-weight: 400;
     font-size: 45px;
-    letter-spacing: -0.05em;
     color: #fff;
 }
 
-.golden{
-    color: #ffd52b;
-}
 
-.wins{
+.stat{
     font-family: var(--font-family);
-    font-weight: 400;
     font-size: 40px;
-    letter-spacing: -0.05em;
-    color: #fff;
-}
-
-.loses{
-    position: relative;
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 40px;
-    letter-spacing: -0.05em;
     color: #fff;
 }
 

@@ -43,27 +43,34 @@ const handleLogin = async () => {
 
 
 <template>
+
     <div class="modal">
+
         <div class="modal_container">
+
             <div class="modal_body">
 
                 <h3 class="title">Login</h3>
 
                 <div class="data_input">
-                    <div class="input_text"> Nickname: </div> <input id="name" v-model="username">
-                    <div class="input_text"> Password: </div> <input type="password" id="password" v-model="password">
+                    
+                    <input id="name" v-model="username" placeholder="Nickname">
+                    <input type="password" id="password" v-model="password" placeholder="Password">
                 </div>
 
                 <button id="confirm" @click="handleLogin"> Login </button>
 
+                
+                <div class="ps">Not registered yet? <button id="reftologin" class="ps" @click="switchToRegister"> Click to register </button>
+                </div>
+                
                 <div class="error">{{ _error }}</div>
-
-                <div class="ps">Вы ещё не регистрировались? <br /> Ну так вперёд!</div>
-                <button id="reftologin" class="ps" @click="switchToRegister"> Нажмите для register </button>
             </div>
             <button id="exit" @click="closedmodal">&#10006;</button>
         </div>
+
     </div>
+
 </template>
 
 <style scoped>
@@ -73,18 +80,28 @@ const handleLogin = async () => {
     display: flex;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.8);
-    padding: 15px;
 }
 
-.modal_container{
+.modal_container {
     position: relative;
     margin: auto;
     width: 700px;
     height: 510px;
-    border-radius: 35px;
-    border: 3px dashed #fff;
-    background: #272727;
-    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: black; /* Черный фон для контраста */
+}
+
+/* Создаем псевдоэлемент для градиентной границы */
+.modal_container::before {
+    content: '';
+    position: absolute;
+    top: -6px; /* Смещение вверх */
+    left: -6px; /* Смещение влево */
+    right: -6px; /* Смещение вправо */
+    bottom: -6px; /* Смещение вниз */
+    border-radius: 36px; /* Больше радиуса, чтобы граница была видна */
+    background: linear-gradient(to right, #ff5e5e, #2ec0ff); /* Градиент */
+    z-index: -1; /* Псевдоэлемент находится под основным элементом */
 }
 
 .modal_body{
@@ -92,7 +109,6 @@ const handleLogin = async () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 25px 0px;
 }
 
 #exit{
@@ -100,79 +116,99 @@ const handleLogin = async () => {
     border: none;
     background-color: transparent;
     cursor: pointer;
-    font-size: 30px;
+    font-size: 45px;
     color: #fff;
-    padding: 0;
-    top: 5px;
-    right: 15px;
+    top: 35px;
+    right: 35px;
 }
 
 .title {
     font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 35px;
-    color: #fff;
     text-align: center;
-    margin: 0;
-    margin-bottom: 75px;
-    padding: 0px;
-    width: 100%;
+    font-size: 60px;
+    margin: 0px;
+    margin-top: 25px;
+    background-image: linear-gradient(to right, #FF5E5E, #2EC0FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    
 }
 
 .data_input{
+    padding-top: 45px;
     display: flex;
     width: 100%;
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: center;
+
 }
 
 .input_text {
     font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 30px;
-    color: #fff;
+    font-size: 45px;
+    color: #2ec0ff;
     width: 30%;
 }
 
-#name{
+#name {
     font-family: var(--font-family);
+    text-align: center;
+    font-size: 30px;
     border: 3px solid #fff;
-    width: 40%;
-    height: 25px;
-    background: #272727;
+    border-radius: 20px;
+    width: 350px;
+    height: 40px;
+    background: none;
     color: #fff;
 }
 
-#password{
+#name::placeholder {
+    color: rgba(46, 192, 255, 0.5);
+    opacity: 1; /* Убедиться, что браузер не снижает яркость */
+}
+
+#password {
     font-family: var(--font-family);
+    font-size: 30px;
+    text-align: center;
     border: 3px solid #fff;
-    width: 40%;
-    height: 25px;
-    background: #272727;
+    border-radius: 20px;
+    width: 350px;
+    height: 40px;
+    background: none;
     color: #fff;
+    margin-top: 45px;
+}
+
+#password::placeholder {
+    color: rgba(46, 192, 255, 0.5);
+    opacity: 1; /* Убедиться, что браузер не снижает яркость */
 }
 
 #confirm{
     border: 3px solid #fff;
+    border-radius: 20px;
     width: 200px;
     height: 40px;
-    background: #272727;
+    background: none;
+    text-align:center;
+    margin-top: 20px;
 
     font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 20px;
-    letter-spacing: -0.03em;
-    color: #fff;
+    font-size: 25px;
+    text-align: center;
+    color: #FF5E5E;
 
     cursor: pointer;
 }
 
 .ps{
-    font-family: var(--second-family);
-    font-weight: 400;
+    font-family: var(--font-family);
     font-size: 25px;
-    letter-spacing: -0.03em;
+    margin-top: 20px;
+    text-align:center;
     color: #fff;
 }
 
@@ -181,14 +217,16 @@ const handleLogin = async () => {
     border: none;
     color: #ff5e5e;
     cursor: pointer;
+    margin: 0;
 }
 
 .error{
-    font-family: var(--second-family);
-    font-weight: 400;
-    font-size: 15px;
-    letter-spacing: -0.03em;
+    font-family: var(--font-family);
+    font-size: 20px;
+    text-align: center;
+    margin-top: 20px;
     color: #ff5e5e;
+    
 }
 
 </style>

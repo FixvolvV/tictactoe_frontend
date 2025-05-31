@@ -137,41 +137,69 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="body">
+
     <div class="header">
+
       <div class="element player1">
+
         <h3>Player 1</h3>
+
         <div>Nickname: {{ player1 }}</div>
+
         <div>Wins: {{ player1_wins }}</div>
+
       </div>
+
       <div class="element timer">
+
         <h3>Time</h3>
+
         <div>00:00</div>
       </div>
+
       <div class="element player2">
+
         <h3>Player 2</h3>
+
         <div>Nickname: {{ player2 }}</div>
+
         <div>Wins: {{ player2_wins }}</div>
+
       </div>
+
     </div>
 
     <div class="game">
+
       <div class="container">
         <Grid :gameBoard="gameBoard" :sendMove="sendMove" :user_symbol="user_symbol" />
       </div>
     </div>
 
     <div class="footer">
+
       <button class="element giveup" @click="handleGiveUp">Give Up</button>
+
       <div class="element info">
+
         <div class="symbol">Your Symbol</div>
+
         <div class="timeturn">Time to move</div>
+
         <div v-if="user_symbol === 'X'" class="symbol_1" style="color: #ff5e5e">X</div>
+
         <div v-if="user_symbol === 'O'" class="symbol_1" style="color: #2ec0ff">O</div>
+
         <div v-else class="symbol_1"> </div>
+
         <div v-if="turn" class="timeturn_1" style="color: #49b52e;">Your Turn</div>
+
         <div v-else class="timeturn_1" style="color: #fff;">Waiting...</div>
+
       </div>
+
     </div>
+    
   </div>
 </template>
 
