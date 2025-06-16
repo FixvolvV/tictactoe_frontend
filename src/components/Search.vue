@@ -2,12 +2,12 @@
 import { ref, onMounted, watch } from 'vue';
 import image from '../assets/logo.png';
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '../stores/auth.js'
+import { useAuthStore } from '../stores/auth.js'
 import api from '../services/axios.js'
 
 const router = useRouter()
 const route = useRoute()
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const props = defineProps({
     closedmodal:{
@@ -40,7 +40,7 @@ watch(
 );
 
 onMounted(async () => {
-  await userStore.getSelf()
+  await authStore.getSelf()
   const response = await api.get(`/get/profile/${route.params.id}`)
   nickname.value = response.data.user_data.username
   total.value = response.data.user_data.games['total']
@@ -53,13 +53,6 @@ onMounted(async () => {
 
 
 <template>
-
-  <!-- image
-  nickname
-  total
-  wins
-  loses
-  place -->
 
     <div class="modal">
         <div class="modal_container">

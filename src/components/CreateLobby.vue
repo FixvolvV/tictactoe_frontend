@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { useUserStore } from '../stores/auth.js'
+import { useAuthStore } from '../stores/auth.js'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/axios.js'
 
@@ -12,7 +12,7 @@ const props = defineProps({
   }
 });
 
-const authStore = useUserStore();
+const authStore = useAuthStore();
 const router = useRouter()
 const route = useRoute()
 
@@ -26,9 +26,9 @@ const _error = ref('')
 const handleCreateLobby = async () => {
   try {
     _error.value = ''
-    const response = await api.post(`/game/createlobby`, null, {
+    const response = await api.post(`/lobby/create`, null, {
         params: {
-            lobby_name: `${name.value}`
+            lobbyname: `${name.value}`
         }
     });
 

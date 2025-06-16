@@ -1,56 +1,37 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import Leaders from '../components/Leaders.vue';
 import Profile from '../components/Profile.vue';
 import Search from '../components/Search.vue';
-import { useUserStore } from '../stores/auth.js'
-import { useRoute, useRouter } from 'vue-router'
-import api from '../services/axios.js'
+import { useAuthStore } from '../stores/auth.js';
+import { useRouter } from 'vue-router';
+import { useUiStore } from '../stores/ui.js';
+import { useLeaderboardStore } from '../stores/leaderboard.js'; 
 
-const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
+const router = useRouter();
+const authStore = useAuthStore();
+const uiStore = useUiStore(); 
+const leaderboardStore = useLeaderboardStore();
 
-const leaders = ref([{id: 0, username:'Xuih', games:{wins:3, loses: 4}}, {id: 0, username:'Xuih', games:{wins:3, loses: 4}}, {id: 0, username:'Xuih', games:{wins:3, loses: 4}}, {id: 0, username:'Xuih', games:{wins:3, loses: 4}}, {id: 0, username:'Xuih', games:{wins:3, loses: 4}}]);
+const isSearchOpen = ref(false);  
 
-// Состояния модальных окон
-const isProfile = ref(false);
-const isSearch = ref(false);
+const openSearch = () => { isSearchOpen.value = true; };
 
-// Функция открытия профиля
-const openProfile = () => {
-  isProfile.value = true;
+const closedLocalModals = () => {
+    isProfileOpen.value = false;
+    isSearchOpen.value = false;
 };
-
-// Функция открытия поиска
-const openSearch = () => {
-  isSearch.value = true;
-};
-
-// Функция закрытия модальных окон
-const closedmodal = () => {
-    isProfile.value = false;
-    isSearch.value = false;
-};
-
-
-const getLeaders = async () => {
-    leaders.value = await api.get("/get/leaderslist")
-    leaders.value = leaders._rawValue.data
-}
 
 onMounted(async () => {
-    await userStore.getSelf()
-    await getLeaders()
-})
+    await leaderboardStore.fetchLeaders(); 
+});
 </script>
-
 <template>
     <div class="body">
         <div class="buttonMenu-wrapper">
           <div class="buttonMenu">
             <button @click="router.push('/')" class="elementMenu"><img src="../assets/backButton.png"/></button>
-            <button @click="openProfile" class="elementMenu"><img src="../assets/infoButton.png"/></button>
+            <button @click="uiStore.openProfileModal(null)" class="elementMenu"><img src="../assets/infoButton.png"/></button>
             <button @click="openSearch" class="elementMenu"><img src="../assets/search.png"/></button>
           </div>
         </div>
@@ -59,21 +40,17 @@ onMounted(async () => {
             <div id="leaderbord">
                 <h3>Leaderboard</h3>
                 <div class="leaderbord-container">
-                    <Leaders v-for="(el, index) in leaders"
+                    <Leaders v-for="(el, index) in leaderboardStore.sortedLeaders"
                             :key="el.id"
                             :id="el.id"
-                            :place="index+1"
+                            :place="el.place"
                             :username="el.username"
-                            :wins="el.games['wins']"
-                            :loses="el.games['loses']" />
+                            :wins="el.profile.wins"
+                            :loses="el.profile.loses" />
                 </div>
             </div>
         </div>
 
-        <!-- Модальное окно профиля -->
-        <Profile v-if="isProfile" :closedmodal="closedmodal"/>
-
-        <!-- Модальное окно поиска -->
         <Search v-if="isSearch" :closedmodal="closedmodal"/>
     </div>
 </template>

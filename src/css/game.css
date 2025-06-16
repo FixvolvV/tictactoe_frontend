@@ -1,170 +1,143 @@
 .body {
-    background: linear-gradient(135deg, #0e3648 0%, #000 33.5%, #000 62%, #431616 100%);
-}
+    background: linear-gradient(to bottom right, #0e3648, #000, #000, #431616);
+    background-size: cover;
+    background-position: center;
 
-.header {
+    margin: 0;
+    padding: 0vw;
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
+    gap: 5%;
+    flex-direction: column;
+
+    height: 100vh;
+    overflow: hidden;
 }
 
-.header > .element{
-    margin: 15px;
-    font-family: var(--font-family);
+
+.containerWaiting {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3vh;
+
+}
+
+.userList {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 25px;
+    width: 50vw;
+    height: 50vh;
+
+    background: rgba(0, 0, 0, 0);
+
     text-align: center;
+
+    overflow: hidden;
+    overflow-y: auto;
+
+    h3 {
+        padding: 0px;
+        margin: 2vh 0px 2vh 0px;
+        font-family: var(--font-family);
+        font-weight: 400;
+        font-size: 40px;
+        color: #fff;
+    }
+
+    .userContainer {
+
+        padding: 1vh 0px 1vh 0px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2vh;
+
+        overflow-y: auto;
+
+    }
+
 }
 
-.player1{
-    border-radius: 45px;
-    border: 3px solid #FF5E5E;
-    width: 300px;
-    height: 184px;
-    background: #343434;
-}
-
-.player1 > h3{
-    margin: 5px;
-    margin-bottom: 25px;
-    padding: 0px;
-    font-weight: 500;
-    font-size: 30px;
-    letter-spacing: -0.03em;
-    color: #FF5E5E;
-}
-
-.player1 > div{ 
-    margin-top: 15px;
-    font-weight: 500;
-    font-size: 25px;
-    letter-spacing: -0.03em;
-    color: #fff;
-}
-
-.timer{
-    border-radius: 35px;
-    border: 3px solid #5f37a4;
-    width: 237px;
-    height: 147px;
-    background: #343434;
-}
-
-.timer > h3{
-    margin: 5px;
-    padding: 0px;
-    font-size: 45px;
-    color: #5f37a4;
-}
-
-.timer > div{
-    margin-top: 15px;
-    padding: 0px;
-    font-size: 45px;
-    color: #fff;
-}
-
-.player2{
-    border-radius: 45px;
-    border: 3px solid #2EC0FF;
-    width: 300px;
-    height: 184px;
-    background: #343434;
-}
-
-.player2 > h3{
-    margin: 5px;
-    margin-bottom: 25px;
-    font-weight: 500;
-    font-size: 30px;
-    letter-spacing: -0.03em;
-    color: #2EC0FF;
-}
-
-.player2 > div{
-    margin-top: 15px;
-    font-weight: 500;
-    font-size: 25px;
-    letter-spacing: -0.03em;
-    color: #fff;
-}
-
-.game{
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.container{
-    width: 800px;
-    height: 500px;
-    border-radius: 35px;
-    background: linear-gradient(90deg, #2EC0FF, #FF5E5E);
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-}
-
-.footer{
+.buttons {
     display: flex;
     flex-direction: row;
-    gap: 1%;
     justify-content: center;
     align-items: center;
-}
 
-.footer > .element{
-    margin: 15px;
-    font-family: var(--font-family);
-}
-
-.giveup{
-    font-size: 30px;
-    color: #ff5e5e;
-
-    border-radius: 25px;
-    border: 0px;
-    width: 130px;
-    height: 140px;
-    background: #343434;
-}
-
-.info{
     border: 2px solid #fff;
-    border-radius: 25px;
-    width: 340px;
-    height: 140px;
-    background: #343434;
-    display: grid;
-    justify-content: center;
-    align-items: start;
-    justify-items: center;
-    grid: repeat(2, 70px) / 136px 204px
+    border-radius: 30px;
+    width: 20vw;
+    min-width: 150px;
+    height: 10vh;
+
+    padding: 5px;
+
+    gap: 2vw;
+
+    .btn {
+        background: rgba(52, 52, 52, 0.5);
+        border: 0px;
+        border-radius: 0px;
+
+        font-family: var(--font-family);
+        font-weight: 400;
+        font-size: 30px;
+        color: #FFFFFF;
+
+    }
+
+    #Ready {
+        border: 2px solid #57ff1a;
+        border-radius: 15px;
+        width: 156px;
+        height: 56px;
+        cursor: pointer;
+        transition: 1.2s;
+    }
+
+    #Ready:hover {
+        color: #57ff1a;
+        font-size: 35px;
+
+    }
+
+    #Leave {
+        border: 2px solid #fb3b22;
+        border-radius: 15px;
+        width: 86px;
+        height: 56px;
+        cursor: pointer;
+        transition: 1.2s;
+    }
+
+    #Leave:hover {
+        color: #fb3b22;
+        font-size: 35px;
+
+    }
+
 }
 
-.info *{
-    font-family: var(--font-family);
+
+
+
+.userList::-webkit-scrollbar {
+    width: 8px;
 }
 
-.symbol{
-    margin-top: 15px;
-    font-size: 15px;
-    color: #fff;
+.userList::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 15px 0;
 }
 
-.timeturn{
-    margin-top: 15px;
-    font-size: 15px;
-    color: #fff;
+.userList::-webkit-scrollbar-thumb {
+    background: #ff5e5e;
+    border-radius: 4px;
 }
 
-.symbol_1{
-    font-size: 40px;
-}
-
-.timeturn_1{
-    align-self: baseline;
-    font-size: 30px;
+.userList::-webkit-scrollbar-thumb:hover {
+    background: #2ec0ff;
 }

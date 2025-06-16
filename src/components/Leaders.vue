@@ -1,5 +1,8 @@
 <script setup>
 import { defineProps } from 'vue';
+import { useUiStore } from '../stores/ui.js';
+
+const uiStore = useUiStore(); 
 
 // Определяем props
 defineProps({
@@ -29,7 +32,7 @@ defineProps({
 
 <template>
 
-    <div class="leaders_container">
+    <div class="leaders_container" @click="uiStore.openProfileModal(id)">
         <div class="container1">
             <img v-if="place in [1, 2, 3, 4]" src="../assets/crown.png">
     

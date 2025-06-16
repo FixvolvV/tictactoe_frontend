@@ -2,9 +2,13 @@
 import { ref, defineProps, onMounted } from 'vue';
 import api from '../services/axios.js'
 import { useRoute, useRouter } from 'vue-router'
+import { useUiStore } from '../stores/ui.js';
+
 
 const router = useRouter()
 const route = useRoute()
+
+
 
 // Определяем props
 const props = defineProps({
@@ -23,26 +27,17 @@ const props = defineProps({
   gamemode: {
     type: String,
     required: true
-  },
-  reference: {
-    type: Function,
-    required: true
   }
 });
 
-const _owner = ref(null);
 
 const clickHandler = async() => {
-  props.reference(`/game/${props.id}`)
+  router.push(`/game/${props.id}`)
 }
 
 onMounted( async () => {
-  const response = await api.get(`/get/profile/${props.owner}`)
-  _owner.value = response.data.user_data.username
 
 });
-
-
 </script>
 
 

@@ -3,12 +3,12 @@
 }
 
 .body {
-    background: linear-gradient(to bottom right,#0e3648,#000,#000, #431616);
+    background: linear-gradient(to bottom right, #0e3648, #000, #000, #431616);
     background-size: cover;
     background-position: center;
 
     margin: 0;
-    padding: 2vh;
+    padding: 0vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,13 +18,15 @@
     height: 100vh;
     overflow: hidden;
 }
+
 .buttonMenu-wrapper {
     width: 90vw;
     max-width: 500px;
     border-radius: 50px;
     background: linear-gradient(to right, #ff5e5e, #2ec0ff);
     display: inline-flex;
-    height: 14vh; /* Увеличена высота на 2% от высоты viewport */
+    height: 10vh;
+    /* Увеличена высота на 2% от высоты viewport */
     padding: 3px;
     margin: 10px;
     box-sizing: border-box;
@@ -40,14 +42,14 @@
     justify-content: space-between;
     background: rgba(0, 0, 0, 1);
     border-radius: 50px;
-    
+
     img {
         max-width: 10vw;
         max-height: 10vw;
         min-width: 30px;
         min-height: 30px;
     }
-    
+
     .elementMenu {
         max-width: 10vw;
         max-height: 10vw;
@@ -65,7 +67,8 @@
         border-radius: 30px;
         cursor: pointer;
     }
-    .elementMenu:hover{
+
+    .elementMenu:hover {
         background-color: rgba(159, 153, 153, 0.8);
     }
 }
@@ -93,7 +96,8 @@
 .lobby-gradient-wrapper {
     width: 65%;
     margin: 20px auto;
-    padding: 2px; /* Для градиентной границы */
+    padding: 2px;
+    /* Для градиентной границы */
     border-radius: 17px;
     background: linear-gradient(to right, #ff5e5e, #2ec0ff);
 }

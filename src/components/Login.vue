@@ -1,43 +1,38 @@
 <script setup>
-import { ref } from 'vue';
-import { useUserStore } from '../stores/auth.js'
+import { ref } from 'vue'; // ref оставляем
+// defineEmits не требует импорта в <script setup>
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth.js';
+import { useUiStore } from '../stores/ui.js';
 
-// Пропсы для управления окнами
-const props = defineProps({
-  closedmodal: {
-    type: Function,
-    required: true
-  },
-  openedregister: {
-    type: Function,
-    required: true,
-  }
-});
+const emit = defineEmits(['close']); // Объявляем событие 'close'
+const authStore = useAuthStore();
+const uiStore = useUiStore();
+const router = useRouter();
 
-const authStore = useUserStore();
-
-// Реактивные переменные
-const isOpen = ref(true);
-const username = ref('');
+const username = ref('')
 const password = ref('');
-const _error = ref('')
 
-// Логика переключения на окно регистрации
-const switchToRegister = () => {
-  props.closedmodal();  // Закрываем текущее окно
-  props.openedregister(); // Открываем окно регистрации
+const _error = ref("")
+
+const handleLogin = async () => {
+    try {
+        _error.value = ""
+        const success = await authStore.login({ username: username.value, password: password.value });
+        if (success) {
+            emit('close'); // Закрываем модальное окно
+            const redirectPath = uiStore.redirectPathAfterLogin || '/';
+            uiStore.redirectPathAfterLogin = null; // Очищаем путь
+            router.push(redirectPath);
+        }
+    } catch(error) {
+        _error.value = error
+    }
 };
 
-// Отправка формы
-const handleLogin = async () => {
-  try {
-    _error.value = ''
-    await authStore.login({ username: username.value, password: password.value });
-    props.closedmodal();
-  } catch (error) {
-    console.error(error)
-    _error.value = error
-  }
+const openRegisterFromLogin = () => {
+  uiStore.openRegisterModal(); 
+  emit('close'); 
 };
 </script>
 
@@ -61,12 +56,12 @@ const handleLogin = async () => {
                 <button id="confirm" @click="handleLogin"> Login </button>
 
                 
-                <div class="ps">Not registered yet? <button id="reftologin" class="ps" @click="switchToRegister"> Click to register </button>
+                <div class="ps">Not registered yet? <button id="reftologin" class="ps" @click="uiStore.openRegisterModal"> Click to register </button>
                 </div>
                 
                 <div class="error">{{ _error }}</div>
             </div>
-            <button id="exit" @click="closedmodal">&#10006;</button>
+            <button id="exit" @click="uiStore.closeAllModals">&#10006;</button>
         </div>
 
     </div>
@@ -118,8 +113,8 @@ const handleLogin = async () => {
     cursor: pointer;
     font-size: 45px;
     color: #fff;
-    top: 35px;
-    right: 35px;
+    top: 15px;
+    right: 20px;
 }
 
 .title {

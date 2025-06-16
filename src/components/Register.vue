@@ -1,46 +1,40 @@
 <script setup>
-import { ref } from 'vue';
-import { useUserStore } from '../stores/auth.js'
+import { ref } from 'vue'; // ref оставляем
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth.js';
+import { useUiStore } from '../stores/ui.js';
 
-// Пропсы для управления окнами
-const props = defineProps({
-  closedmodal: {
-    type: Function,
-    required: true
-  },
-  openedlogin: {
-    type: Function,
-    required: true,
-  }
-});
+const emit = defineEmits(['close']);
+const authStore = useAuthStore();
+const uiStore = useUiStore();
+const router = useRouter();
 
-const authStore = useUserStore();
-
-// Реактивные переменные
-const isOpen = ref(true);
 const username = ref('');
+const email = ref('');
 const password = ref('');
-const _error = ref('')
 
-// Логика переключения на окно входа
-const switchToLogin = () => {
-  props.closedmodal();  // Закрываем текущее окно
-  props.openedlogin(); // Открываем окно входа
+const _error = ref("")
+
+const handleRegister = async () => {
+    try {
+        _error.value = ""
+        const success = await authStore.register({ username: username.value, email: email.value, password: password.value });
+        if (success) {
+            emit('close'); 
+            router.push('/'); // Перенаправляем на главную
+        }
+    } catch (error) {
+        console.log(error)
+        _error.value = error
+  }
 };
 
-// Отправка формы
-const handleRegister = async () => {
-  try {
-    _error.value = ''
-
-    await authStore.register({ username: username.value, password: password.value });
-    props.closedmodal();
-  } catch (error) {
-    console.error(error)
-    _error.value = error
-  }
+const openLoginFromRegister = () => {
+  uiStore.openLoginModal(); 
+  emit('close'); 
 };
 </script>
+
 
 <template>
     <div class="modal">
@@ -55,6 +49,12 @@ const handleRegister = async () => {
                     <input id="name" v-model="username">
                 </div>
 
+                <div class="data_input">
+
+                    <div class="input_text"> Email:</div>
+                    <input id="email" v-model="email">
+                </div>
+
                 <div class=data_input>
 
                     <div class="input_text"> Password: </div>
@@ -65,11 +65,11 @@ const handleRegister = async () => {
                 <button id="confirm" @click="handleRegister"> Register </button>
 
                 
-                <div class="ps">Registered already? <button id="reftologin" class="ps" @click="switchToLogin"> Click to enter </button></div>
+                <div class="ps">Registered already? <button id="reftologin" class="ps" @click="uiStore.openLoginModal"> Click to enter </button></div>
                 
             </div>
-            <div class="error">{{_error}}</div>
-            <button id="exit" @click="closedmodal">&#10006;</button>
+            <div v-if="_error" class="error">{{_error}}</div>
+            <button id="exit" @click="uiStore.closeAllModals">&#10006;</button>
         </div>
     </div>
 </template>
@@ -89,7 +89,7 @@ const handleRegister = async () => {
     position: relative;
     margin: auto;
     width: 700px;
-    height: 510px;
+    height: 560px;
     border-radius: 30px;
     background-color: black; /* Черный фон для контраста */
 }
@@ -121,8 +121,8 @@ const handleRegister = async () => {
     cursor: pointer;
     font-size: 45px;
     color: #fff;
-    top: 35px;
-    right: 35px;
+    top: 15px;
+    right: 25px;
 }
 
 .title {
@@ -154,6 +154,17 @@ const handleRegister = async () => {
 }
 
 #name{
+    text-align: center;
+    font-size: 30px;
+    border: 3px solid #fff;
+    border-radius: 20px;
+    width: 350px;
+    height: 40px;
+    background: none;
+    color: #fff;
+}
+
+#email{
     text-align: center;
     font-size: 30px;
     border: 3px solid #fff;

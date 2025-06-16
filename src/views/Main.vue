@@ -1,76 +1,55 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import Register from '../components/Register.vue';
-import Login from '../components/Login.vue';
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth.js'; // Используем useAuthStore
+import { useUiStore } from '../stores/ui.js';   // Используем useUiStore
+import api from '../services/axios.js';       // Наш настроенный Axios инстанс
+
+// Компоненты, которые Main.vue может содержать
 import Patch from '../components/Patch.vue';
-import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '../stores/auth.js'
-import api from '../services/axios.js'
+// Login и Register теперь модальные окна и управляются Index.vue/uiStore, поэтому здесь не импортируются и не используются
 
 const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
+const authStore = useAuthStore() // Используем useAuthStore
+const uiStore = useUiStore()     // Используем useUiStore
 
-// Реактивные переменные (аналог data())
-const now = ref(null);
+const active = ref(null);
 const total = ref(null);
-const openregister = ref(false);
-const openlogin = ref(false);
-const patchs = ref([{idpatch: 1, numberpatch: "0.0.0"}, {idpatch: 1, numberpatch:"0.0.0"}] );
+const patchs = ref();
 
-// Управляем состоянием окон
-const isLoginOpen = ref(false);
-const isRegisterOpen = ref(false);
-
-// Функции открытия и закрытия окон
-const openedlogin = () => {
-  isLoginOpen.value = true;
-  isRegisterOpen.value = false;
-};
-
-const openedregister = () => {
-  isRegisterOpen.value = true;
-  isLoginOpen.value = false;
-};
-
-const closedmodal = () => {
-  isLoginOpen.value = false;
-  isRegisterOpen.value = false;
-};
 
 onMounted(async () => {
-  // const response = await api.get('/get/global');
-  // now.value = response.data.now
-  // total.value = response.data.total
-  // await userStore.getSelf()
-
-})
+  try {
+    const response = await api.get('/general/games'); // Пример запроса через настроенный Axios
+    active.value = response.data.active;
+    total.value = response.data.total;
+  } catch (error) {
+    console.error("Failed to fetch global data:", error);
+  }
+});
 
 </script>
-
 
 <template>
   <div class="body">
     <header>
-      <img class="element" src="../assets/logo.png"/>
+      <img class="element" src="../assets/logo.png" alt=""/>
       <h1 class="element">TicTacToe</h1>
       <h2 class="element"><button @click="router.push('/lobby')">Play</button></h2>
       <h2 class="element"><button @click="router.push('/leadersboard')">Leaderboard</button></h2>
-      <img  id="Account" class="element" @click="openedregister" src="../assets/account_icon_null.png"/>
+      <!-- Используем uiStore для открытия модальных окон -->
+      <img id="Account" class="element" v-if="authStore.isAuthenticated" @click="uiStore.openProfileModal(null)" src="../assets/account_icon.png" alt=""/>
+      <img id="Account" class="element" v-else @click="uiStore.openLoginModal" src="../assets/account_icon_null.png" alt=""/>
     </header>
 
-
-
     <div class="flex-container">
-      <div><h2>Now Play: <span style="color: #fff">{{now}}</span></h2> </div>
-
+      <div><h2>Now Play: <span style="color: #fff">{{active}}</span></h2> </div>
       <div><h2>Total Games: <span style="color: #fff">{{total}}</span></h2> </div>
     </div>
 
     <div class="flex-info-container">
         <div class="info">
           <h3>Site Info</h3>
-
           <p>The website is under development... Did you notice the <span style="color:#ff5e5e">bug</span>?)
             Go to discord and <span style="color:#ff5e5e">report it</span> to the developer. Website dedicated to the famous popular game
 “tic-tac-toe” but in their infinite form. In order to win you need to collect 5 crosses or
@@ -82,31 +61,22 @@ zeros in a row, on an infinite field.</p>
     </div>
 
     <footer>
-      <img  id="refLogo"src="../assets/disLogo.png"/>
-      <img id="refLogo"src="../assets/gitLogo.png"/>
+      <img  id="refLogo"src="../assets/disLogo.png" alt=""/>
+      <img id="refLogo"src="../assets/gitLogo.png" alt=""/>
     </footer>
 
-
-    <Register v-if="isRegisterOpen" :closedmodal="closedmodal" :openedlogin="openedlogin" />
-
-
-  <Login v-if="isLoginOpen" :closedmodal="closedmodal" :openedregister="openedregister" />
-
+    <!-- Модальные окна Login и Register теперь находятся в Index.vue, не нужно их здесь рендерить -->
 
   </div>
-
-
 </template>
 
 <style scoped>
-
 @import url(../css/Index.css);
 
 .pathnotes{
   overflow: hidden;
   overflow-y: scroll;
-  -ms-overflow-style: none;  /* IE 10+ */
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 </style>

@@ -1,109 +1,98 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useUserStore } from '../stores/auth.js'
-import { useRoute, useRouter } from 'vue-router'
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { useAuthStore } from '../stores/auth.js'; // Используем useAuthStore
+import { useRouter } from 'vue-router'; // useRoute не используется
+import { useUiStore } from '../stores/ui.js';
 import CreateLobby from '../components/CreateLobby.vue';
-import EventSourcePolyfill from "eventsource-polyfill";
 import Lobbies from '../components/Lobbies.vue';
-import Profile from '../components/Profile.vue';
 import Search from '../components/Search.vue';
-import axios from "axios";
+import { connectSse, disconnectSse, onSseEvent, offSseEvent} from '../services/sse.js';
 
-const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
+const router = useRouter();
+const authStore = useAuthStore(); // Используем useAuthStore
+const uiStore = useUiStore();
 
-const gamemode = ref("Infinity TicTacToe")
-const lobbies = ref([{id: 0, lobbyname: 'Xyeta', players: {player1: 'Nick'}}, {id: 1, lobbyname: 'Xyeta', players: {player1: 'Nick'}}, {id: 1, lobbyname: 'Xyeta', players: {player1: 'Nick'}}, {id: 1, lobbyname: 'Xyeta', players: {player1: 'Nick'}}]);
-let eventSource = null;
+const gamemode = ref("Infinity TicTacToe");
+const lobbies = ref();
+let eventSource = null; // Для SSE
 
 const isCreateLobbyOpen = ref(false);
-const isProfile = ref(false);
 const isSearch = ref(false);
 
-const openedcreatelobby = () => {
-  isCreateLobbyOpen.value = true;
-};
-
-const openProfile = () => {
-  isProfile.value = true;
-};
-
-// Функция открытия поиска
-const openSearch = () => {
-  isSearch.value = true;
-};
-
+const openedcreatelobby = () => { isCreateLobbyOpen.value = true; };
+const openSearch = () => { isSearch.value = true; };
 const closedmodal = () => {
   isCreateLobbyOpen.value = false;
-  isProfile.value = false;
   isSearch.value = false;
 };
 
-const reference = async (_to) => {
-    eventSource.close;
-    router.push(`${_to}`)
-}
+// --- Обработчики событий SSE ---
+const handleLobbiesUpdate = (data) => {
+  lobbies.value = data; // Обновляем список лобби
+};
+
+const handleSseConnected = () => {
+  console.log('Lobby: SSE connected!');
+
+};
+
+const handleSseDisconnected = () => {
+  console.log('Lobby: SSE disconnected!');
+};
+
+const handleSseError = (error) => {
+  console.error('Lobby: SSE error:', error);
+};
+
 
 onMounted(async () => {
-  //   await userStore.getSelf()
+  // Подключаемся к SSE, когда компонент монтируется и пользователь авторизован
+  onSseEvent('lobbies:update', handleLobbiesUpdate);
+  onSseEvent('sse:connected', handleSseConnected);
+  onSseEvent('sse:disconnected', handleSseDisconnected);
+  onSseEvent('sse:error', handleSseError);
 
-  //   eventSource = fetchEventSource(`${import.meta.env.VITE_API_BASE_URL}/get/lobbylist`, {
-  //   method: "GET",
-  //   headers: {
-  //     Authorization: `Bearer ${userStore.token}`, // Токен авторизации
-  //   },
-  //   onmessage(event) {
-  //     let data = JSON.parse(event.data);
-  //     if (data.event === "update_lobbies") {
-  //       lobbies.value = data.data;
-  //     }
-  //   },
-  //   onerror(err) {
-  //     console.error("SSE Error:", err);
-  //   },
-  // });
-
+  if (authStore.isLoggedIn) {
+    connectSse('/lobby/all/wait'); // <-- Эндпоинт для получения списка лобби через SSE
+  }
 });
 
 onBeforeUnmount(() => {
-  //   if (eventSource) {
-  //   eventSource.close;
-  // }
+  // Отключаемся от SSE, когда компонент размонтируется
+  disconnectSse(); 
+  offSseEvent('lobbies:update', handleLobbiesUpdate);
+  offSseEvent('sse:connected', handleSseConnected);
+  offSseEvent('sse:disconnected', handleSseDisconnected);
+  offSseEvent('sse:error', handleSseError);
 });
 
 </script>
-
 
 <template>
     <div class="body">
       <div class="buttonMenu-wrapper">
           <div class="buttonMenu">
-            <button @click="router.push('/')" class="elementMenu"><img src="../assets/backButton.png"/></button>
-            <button @click="openProfile" class="elementMenu"><img src="../assets/infoButton.png"/></button>
-            <button @click="openedcreatelobby" class="elementMenu"><img src="../assets/createLobby.png"/></button>
-            <button @click="openSearch" class="elementMenu"><img src="../assets/search.png"/></button>
+            <button @click="router.push('/')" class="elementMenu"><img src="../assets/backButton.png" alt=""/></button>
+            <button @click="uiStore.openProfileModal(null)" class="elementMenu"><img src="../assets/infoButton.png" alt=""/></button>
+            <button @click="openedcreatelobby" class="elementMenu"><img src="../assets/createLobby.png" alt=""/></button>
+            <button @click="openSearch" class="elementMenu"><img src="../assets/search.png" alt=""/></button>
           </div>
       </div>
       
-      <!-- Обертка для градиентной границы -->
       <div class="lobby-gradient-wrapper">
         <div id="Listlobby">
             <h3>Lobby List</h3>
             <div class="lobbies-container">
                 <Lobbies v-for="el in lobbies" :key="el.id"
                         :id="el.id"
-                        :name="el.lobbyname"
-                        :owner="el.players.player1"
-                        :gamemode="gamemode"
-                        :reference="reference" />
+                        :name="el.name"
+                        :owner="el.owner"
+                        :gamemode="el.gametype" />
             </div>
         </div>
       </div>
       
       <CreateLobby v-if="isCreateLobbyOpen" :closedmodal="closedmodal" />
-      <Profile v-if="isProfile" :closedmodal="closedmodal"/>
       <Search v-if="isSearch" :closedmodal="closedmodal"/>
     </div>
 </template>
@@ -113,26 +102,5 @@ onBeforeUnmount(() => {
 
 @import url(../css/lobby.css);
 
-.chevron {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid rgb(255, 255, 255); 
-}
-
-.stroke {
-    height: 0px;
-    width: 50px;
-    border-top: 3px solid #ffffff;
-    margin: 0%;
-}
-
-.listlobby{
-  overflow: hidden;
-  overflow-y: scroll;
-  -ms-overflow-style: none;  /* IE 10+ */
-  scrollbar-width: none;
-}
 
 </style>
