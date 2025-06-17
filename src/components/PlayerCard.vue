@@ -31,7 +31,7 @@ const props = defineProps({
     required: true
   },
   wins: {
-    type: String,
+    type: Number,
     required: true
   },
   symbol: {

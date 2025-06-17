@@ -30,7 +30,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/game/:lobbyId', // ID лобби как параметр маршрута
+    path: '/game/:id', // ID лобби как параметр маршрута
     name: 'game',
     component: Game,
     meta: { requiresAuth: true } // Страница игры требует авторизации

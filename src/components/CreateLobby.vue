@@ -1,10 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '../stores/auth.js'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import api from '../services/axios.js'
 
-// Пропсы для управления окнами
 const props = defineProps({
   closedmodal: {
     type: Function,
@@ -14,15 +13,11 @@ const props = defineProps({
 
 const authStore = useAuthStore();
 const router = useRouter()
-const route = useRoute()
 
-// Реактивные переменные
 const isOpen = ref(true);
 const name = ref('');
 const _error = ref('')
-// Логика переключения на окно регистрации
 
-// Отправка формы
 const handleCreateLobby = async () => {
   try {
     _error.value = ''
@@ -32,18 +27,26 @@ const handleCreateLobby = async () => {
         }
     });
 
-    console.log(response)
-
-    router.push(`/game/${response.data}`)
+    // *** ИСПРАВЛЕНО ЗДЕСЬ: ***
+    // Проверяем, что response.data - это строка (прямой ID) или объект с полем lobby_id
+    let lobbyId;
+    if (typeof response.data === 'string') {
+      lobbyId = response.data;
+    } else if (response.data && response.data.lobby_id) {
+      lobbyId = response.data.lobby_id;
+    } else {
+      throw new Error("Invalid lobby ID received from server.");
+    }
+    
+    router.push(`/game/${lobbyId}`); // Используем корректный ID
 
     props.closedmodal();
   } catch (error) {
-    console.error(error)
-    _error.value = error
+    console.error(error);
+    _error.value = error.response?.data?.detail || error.message || "An unknown error occurred.";
   }
 };
 </script>
-
 
 <template>
     <div class="modal">
@@ -66,7 +69,7 @@ const handleCreateLobby = async () => {
 </template>
 
 <style scoped>
-
+/* Ваши стили */
 .modal {
     position: fixed;
     display: flex;
@@ -183,5 +186,4 @@ const handleCreateLobby = async () => {
     font-size: 15px;
     color: #ff5e5e;
 }
-
 </style>
