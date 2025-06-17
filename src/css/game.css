@@ -317,7 +317,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.30);
     /* Полупрозрачный черный фон */
     display: flex;
     justify-content: center;
@@ -326,7 +326,7 @@
     /* Высокий z-index, чтобы быть над всеми элементами */
     backdrop-filter: blur(1px);
     /* Эффект размытия фона (для современных браузеров) */
-    animation: fadeIn 5s ease-out forwards;
+    animation: fadeIn 2s ease-out forwards;
     /* Анимация появления */
 }
 
