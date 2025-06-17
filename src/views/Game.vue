@@ -34,7 +34,6 @@
         @mouseup="endPan"
         @mouseleave="endPan"
         @wheel="onZoom"
-        @click="handleCellClick"
         :style="boardStyle"
       >
         <div
@@ -64,6 +63,7 @@
           {{ yourTurn ? "You're Turn" : "Enemy Turn" }}
         </p>
         <button class="giveup">GIVE UP</button>
+        <button class="reset-view-btn" @click="resetBoardView">Center View</button>
       </div>
     </div>
   </div>
@@ -85,8 +85,9 @@ import {
 } from "../services/websocket";
 
 // --- Константы
-const CELL_SIZE = 40; // Размер одной ячейки в пикселях (40px, как в CSS)
-const EXPANSION_MARGIN = 5; // Маржа расширения поля вокруг занятых ячеек
+const CELL_SIZE = 40;
+const EXPANSION_MARGIN = 5;
+const DRAG_THRESHOLD = 5; // Порог в пикселях для определения начала перетаскивания
 
 // --- Routing + Store
 const route = useRoute();
@@ -106,46 +107,77 @@ const currentTurnSymbol = ref(null);
 const yourTurn = computed(() => currentTurnSymbol.value === playerSymbol.value);
 
 // --- Карта ходов
-// `cells` хранит только сделанные ходы (например, '0,0' -> {x:0, y:0, symbol:'X'})
 const cells = reactive(new Map());
 const lastMove = ref(null);
 const winLine = ref([]);
 
 // --- Зум и перемещение доски
 const scale = ref(1);
-// `offset` теперь представляет смещение ЦЕНТРА game-board от ЦЕНТРА containerGame
 const offset = reactive({ x: 0, y: 0 });
-const boardRef = ref(null); // Ссылка на DOM-элемент игрового поля
+const boardRef = ref(null);
 
 const isPanning = ref(false);
 const lastMousePos = reactive({ x: 0, y: 0 });
+const mouseDownStartPos = reactive({ x: 0, y: 0 }); // Координаты начального нажатия мыши
+const hasDragged = ref(false); // Флаг, был ли Drag (перетаскивание)
 
+// --- 1. Логика перетаскивания и предотвращения случайных кликов
 const startPan = (e) => {
-  if (e.button === 0) { // Только левая кнопка мыши
+  // Начинаем панорамирование только при нажатии левой (0) или средней (1) кнопки мыши
+  if (e.button === 0 || e.button === 1) {
     isPanning.value = true;
+    hasDragged.value = false; // Сбрасываем флаг Drag при новом нажатии
     lastMousePos.x = e.clientX;
     lastMousePos.y = e.clientY;
+    mouseDownStartPos.x = e.clientX; // Запоминаем стартовую позицию для проверки Drag
+    mouseDownStartPos.y = e.clientY;
+
     boardRef.value.style.cursor = 'grabbing';
+
+    if (e.button === 1) { // Если средняя кнопка, предотвращаем стандартное автопролистывание
+      e.preventDefault();
+    }
   }
 };
 
 const onPan = (e) => {
   if (!isPanning.value) return;
+
   const dx = e.clientX - lastMousePos.x;
   const dy = e.clientY - lastMousePos.y;
-  offset.x += dx; // Просто изменяем смещение центра
+
+  // Если еще не было зафиксировано перетаскивания, проверяем порог
+  if (!hasDragged.value) {
+    const totalDxFromStart = e.clientX - mouseDownStartPos.x;
+    const totalDyFromStart = e.clientY - mouseDownStartPos.y;
+    if (Math.abs(totalDxFromStart) > DRAG_THRESHOLD || Math.abs(totalDyFromStart) > DRAG_THRESHOLD) {
+      hasDragged.value = true; // Перемещение превысило порог, это Drag
+    }
+  }
+
+  offset.x += dx;
   offset.y += dy;
   lastMousePos.x = e.clientX;
   lastMousePos.y = e.clientY;
 };
 
-const endPan = () => {
+const endPan = (e) => {
+  if (!isPanning.value) return; // Если не было активно панорамирование, просто выходим
+
   isPanning.value = false;
   if (boardRef.value) {
     boardRef.value.style.cursor = 'grab';
   }
+
+  // Если не было зафиксировано перетаскивания (т.е. перемещение было меньше порога)
+  // И событие пришло от левой кнопки мыши (0), которая обычно генерирует клик
+  if (!hasDragged.value && e.button === 0) {
+    handleCellClick(e); // Ручной вызов обработчика клика
+  }
+  hasDragged.value = false; // Сбрасываем флаг Drag для следующего взаимодействия
 };
 
+// Логика зума без изменений
 const onZoom = (e) => {
   e.preventDefault();
   const zoomSpeed = 0.1;
@@ -154,40 +186,29 @@ const onZoom = (e) => {
     ? Math.min(oldScale + zoomSpeed, 3)
     : Math.max(oldScale - zoomSpeed, 0.4);
 
-  // Получаем размеры родительского контейнера для вычисления центра
   const containerGame = document.querySelector('.containerGame');
   if (!containerGame) return;
   const containerRect = containerGame.getBoundingClientRect();
 
-  // Координаты мыши относительно ЦЕНТРА containerGame
   const mouseXRelativeToContainerCenter = e.clientX - (containerRect.left + containerRect.width / 2);
   const mouseYRelativeToContainerCenter = e.clientY - (containerRect.top + containerRect.height / 2);
 
-  // Получаем "мировые" координаты (в системе координат не-трансформированной доски)
-  // точки под курсором, относительно центра доски.
-  // Эта формула переводит экранные координаты (относительно центра контейнера)
-  // в координаты внутри игрового поля (относительно его центра),
-  // учитывая текущее смещение и масштаб.
   const mouseWorldX = (mouseXRelativeToContainerCenter - offset.x) / oldScale;
   const mouseWorldY = (mouseYRelativeToContainerCenter - offset.y) / oldScale;
 
-  // Вычисляем новое смещение `offset`, чтобы "мировая" точка осталась под курсором
   offset.x = mouseXRelativeToContainerCenter - mouseWorldX * scale.value;
   offset.y = mouseYRelativeToContainerCenter - mouseWorldY * scale.value;
 };
 
 
-// Вычисление границ активного поля (bounding box)
 const currentBoardBounds = computed(() => {
   let minX = Infinity, maxX = -Infinity;
   let minY = Infinity, maxY = -Infinity;
 
   if (cells.size === 0) {
-    // Изначальное поле 3x3: от (-1,-1) до (1,1)
     minX = -1; maxX = 1;
     minY = -1; maxY = 1;
   } else {
-    // Вычисляем границы занятых ячеек
     let minOccupiedX = Infinity, maxOccupiedX = -Infinity;
     let minOccupiedY = Infinity, maxOccupiedY = -Infinity;
     for (const cell of cells.values()) {
@@ -196,7 +217,6 @@ const currentBoardBounds = computed(() => {
       if (cell.y < minOccupiedY) minOccupiedY = cell.y;
       if (cell.y > maxOccupiedY) maxOccupiedY = cell.y;
     }
-    // Расширяем границы на EXPANSION_MARGIN
     minX = minOccupiedX - EXPANSION_MARGIN;
     maxX = maxOccupiedX + EXPANSION_MARGIN;
     minY = minOccupiedY - EXPANSION_MARGIN;
@@ -205,27 +225,19 @@ const currentBoardBounds = computed(() => {
   return { minX, maxX, minY, maxY };
 });
 
-// Стиль для game-board
 const boardStyle = computed(() => {
   const { minX, maxX, minY, maxY } = currentBoardBounds.value;
-
-  // Ширина и высота game-board в пикселях
   const width = (maxX - minX + 1) * CELL_SIZE;
   const height = (maxY - minY + 1) * CELL_SIZE;
 
-  // `transform: translate(-50%, -50%)` в CSS (который мы добавим)
-  // центрирует элемент. Наши JS `offset` и `scale` добавляются поверх этого.
   return {
     width: `${width}px`,
     height: `${height}px`,
-    // Базовый transform: translate(-50%, -50%) должен быть в CSS для правильного transform-origin
-    // Затем JS добавляет свое смещение и масштаб:
     transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${scale.value})`,
     backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`,
   };
 });
 
-// Позиционирование ячейки относительно верхнего левого угла game-board
 const getCellStyle = (x, y) => {
   const { minX, minY } = currentBoardBounds.value;
   return {
@@ -234,31 +246,24 @@ const getCellStyle = (x, y) => {
   };
 };
 
-// Обработка клика
+// handleCellClick теперь вызывается либо вручную из endPan (для кликов), либо как раньше
+// Но логика проверки drag/panning теперь в endPan, поэтому избыточные проверки убраны.
 const handleCellClick = (e) => {
-  if (!yourTurn.value) return;
-  if (isPanning.value) return; // Не обрабатываем клик, если идет панорамирование
+  if (!yourTurn.value) return; // Если не наш ход, игнорируем клик
 
   const boardElement = boardRef.value;
   if (!boardElement) return;
 
-  // Получаем размеры родительского контейнера, чтобы найти его центр
   const containerGame = document.querySelector('.containerGame');
   if (!containerGame) return;
   const containerRect = containerGame.getBoundingClientRect();
 
-  // 1. Координаты клика относительно ЦЕНТРА `containerGame`
   const clickXRelativeToContainerCenter = e.clientX - (containerRect.left + containerRect.width / 2);
   const clickYRelativeToContainerCenter = e.clientY - (containerRect.top + containerRect.height / 2);
 
-  // 2. Обратная трансформация: получаем координаты клика в системе координат
-  // не-трансформированного `game-board`, относительно ЕГО ЦЕНТРА.
-  // Мы вычитаем `offset` (наше смещение от центра) и делим на `scale` (наш масштаб).
   const unscaledXRelativeToBoardCenter = (clickXRelativeToContainerCenter - offset.x) / scale.value;
   const unscaledYRelativeToBoardCenter = (clickYRelativeToContainerCenter - offset.y) / scale.value;
 
-  // 3. Вычисляем пиксельные координаты клика относительно ВЕРХНЕГО ЛЕВОГО угла
-  // не-трансформированного `game-board`.
   const { minX, maxX, minY, maxY } = currentBoardBounds.value;
   const boardLogicalWidth = (maxX - minX + 1) * CELL_SIZE;
   const boardLogicalHeight = (maxY - minY + 1) * CELL_SIZE;
@@ -266,29 +271,24 @@ const handleCellClick = (e) => {
   const unscaledXRelativeToBoardTopLeft = unscaledXRelativeToBoardCenter + boardLogicalWidth / 2;
   const unscaledYRelativeToBoardTopLeft = unscaledYRelativeToBoardCenter + boardLogicalHeight / 2;
 
-  // 4. Определяем игровые координаты ячейки (cellX, cellY)
   const cellX = Math.floor(unscaledXRelativeToBoardTopLeft / CELL_SIZE) + minX;
   const cellY = Math.floor(unscaledYRelativeToBoardTopLeft / CELL_SIZE) + minY;
 
   const key = `${cellX},${cellY}`;
 
-  // Проверяем, что кликнутая ячейка находится в пределах активного поля
   const { minX: boundsMinX, maxX: boundsMaxX, minY: boundsMinY, maxY: boundsMaxY } = currentBoardBounds.value;
   if (cellX < boundsMinX || cellX > boundsMaxX ||
       cellY < boundsMinY || cellY > boundsMaxY) {
-    // Кликнули вне активной зоны
-    return;
+    return; // Кликнули вне активной зоны
   }
 
-  // Проверяем, что ячейка не занята
-  if (cells.has(key) && cells.get(key).symbol) return;
+  if (cells.has(key) && cells.get(key).symbol) return; // Ячейка уже занята
 
   cells.set(key, { x: cellX, y: cellY, symbol: playerSymbol.value });
   lastMove.value = { x: cellX, y: cellY };
   sendMove(cellX, cellY);
 };
 
-// Генерация видимых клеток (такая же, как в currentBoardBounds)
 const visibleCells = computed(() => {
   const tempMap = new Map();
   const { minX, maxX, minY, maxY } = currentBoardBounds.value;
@@ -301,11 +301,13 @@ const visibleCells = computed(() => {
   }
 
   const result = Array.from(tempMap.values());
-  result.sort((a, b) => a.y - b.y || a.x - b.x); // Для стабильного порядка
+  result.sort((a, b) => a.y - b.y || a.x - b.x);
   return result;
 });
 
-const isWinningCell = (x, y) => winLine.value.some(pt => pt.x === x && pt.y === y);
+const isWinningCell = (x, y) => {
+  return winLine.value.some(pt => pt.x === x && pt.y === y);
+};
 
 // --- Lobby handlers: join/start/move/win --
 const toggleReady = () => sendReady();
@@ -336,11 +338,9 @@ const handleGameStart = ({ symbol }) => {
   cells.clear();
   lastMove.value = null;
   winLine.value = [];
-  // Сбрасываем позицию и масштаб при начале новой игры
   offset.x = 0;
   offset.y = 0;
   scale.value = 1;
-  // centerBoard(); // Больше не нужно вызывать здесь, watch сделает это
 };
 
 const handleMoveMade = (msg) => {
@@ -380,15 +380,12 @@ const handleWsDisconnected = (event) => {
   }
 };
 
-// Центрирует игровое поле.
-// Так как `offset` теперь означает смещение центра `game-board` от центра `containerGame`,
-// для центрирования достаточно установить `offset` в (0,0).
-const centerBoard = () => {
+const resetBoardView = () => {
   offset.x = 0;
   offset.y = 0;
+  scale.value = 1;
 };
 
-// --- Жизненный цикл (подключение)
 onMounted(() => {
   const lobbyId = route.params.id;
   if (!lobbyId) {
@@ -404,13 +401,12 @@ onMounted(() => {
   onWsEvent("game:lobby_state_update", handleLobbyStateUpdate);
   onWsEvent("ws:disconnected", handleWsDisconnected);
 
-  // Центрируем доску при монтировании и при каждом изменении ее логических границ
   watch([boardRef, currentBoardBounds], ([newBoardRef, newBounds]) => {
     if (newBoardRef && newBounds) {
-      newBoardRef.style.cursor = 'grab'; // Начальный курсор
-      centerBoard(); // Центрируем
+      newBoardRef.style.cursor = 'grab';
+      resetBoardView();
     }
-  }, { immediate: true }); // immediate: true - чтобы сработало сразу при монтировании
+  }, { immediate: true });
 });
 
 onBeforeUnmount(() => {
@@ -424,7 +420,6 @@ onBeforeUnmount(() => {
   disconnectWebSocket();
 });
 </script>
-
 
 <style scoped>
 /* Импортируем твои стили */
