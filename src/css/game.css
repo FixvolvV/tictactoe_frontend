@@ -321,12 +321,12 @@
     /* Полупрозрачный черный фон */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
     z-index: 100;
     /* Высокий z-index, чтобы быть над всеми элементами */
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(1px);
     /* Эффект размытия фона (для современных браузеров) */
-    animation: fadeIn 0.3s ease-out forwards;
+    animation: fadeIn 5s ease-out forwards;
     /* Анимация появления */
 }
 
@@ -334,6 +334,7 @@
     background-color: #1a1a1a;
     border: 2px solid white;
     border-radius: 20px;
+    margin-bottom: 5vh;
     padding: 40px 60px;
     text-align: center;
     color: white;
