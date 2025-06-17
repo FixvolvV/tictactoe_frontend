@@ -91,8 +91,6 @@ const connectWebSocket = (lobbyId) => {
             console.log('WebSocket: Получено сообщение:', message);
             wsMessages.value.push({ type: 'message', data: message, timestamp: new Date() });
 
-            // --- ОБРАБОТКА СОБЫТИЙ СЕРВЕРА (на основе вашего бэкенда) ---
-
             if (message.error) {
                 wsError.value = message.error;
                 emitWsEvent('game:error', message.error);
@@ -106,30 +104,27 @@ const connectWebSocket = (lobbyId) => {
                         sendWebSocketMessage({ action: "ping" });
                         emitWsEvent('ws:ping');
                         break;
-                    case "joined":
-                        emitWsEvent('game:joined', { symbol: message.symbol, state: message.state });
-                        // Если бэкенд в "joined" возвращает полный список игроков
+                    // ИСПРАВЛЕНИЕ 1: Имя события синхронизировано с бэкендом
+                    case "game:joined":
+                        // Бэкенд теперь посылает полное состояние, включая players, symbol и т.д.
+                        // Поэтому просто передаем весь message как данные для 'game:joined'
+                        emitWsEvent('game:joined', message);
+                        break;
+                    case "you_ready": // Это событие бэкенд вроде больше не шлёт явно, его заменяет lobby_state_update
+                        emitWsEvent('game:you_ready'); // Можно оставить для обратной совместимости, если бэкенд вернет
                         if (message.players) { emitWsEvent('game:lobby_state_update', message); }
                         break;
-                    case "you_ready":
-                        emitWsEvent('game:you_ready');
-                        // Если бэкенд в "you_ready" обновляет список игроков (например, свой статус)
-                        if (message.players) { emitWsEvent('game:lobby_state_update', message); }
-                        break;
-                    case "start":
-                        emitWsEvent('game:start', { symbol: message.symbol, state: message.state });
-                        // Если бэкенд в "start" возвращает полный список игроков и состояние доски
+                    case "start": // Это событие бэкенд тоже больше не шлёт, его заменяет lobby_state_update
+                        emitWsEvent('game:start', { symbol: message.symbol, state: message.state }); // Сохраняем, если бэкенд вернет
                         if (message.players || message.board_state) { emitWsEvent('game:lobby_state_update', message); }
                         break;
                     case "win":
-                        emitWsEvent('game:win');
-                        if (message.players) { emitWsEvent('game:lobby_state_update', message); } // После победы может быть обновление счета
+                        emitWsEvent('game:win', message); // Передаем весь message, чтобы получить win_line
                         break;
                     case "lose":
-                        emitWsEvent('game:lose');
-                        if (message.players) { emitWsEvent('game:lobby_state_update', message); } // После поражения может быть обновление счета
+                        emitWsEvent('game:lose', message); // Передаем весь message, чтобы получить win_line
                         break;
-                    case "lobby_state_update": // NEW: Обновление общего состояния лобби
+                    case "lobby_state_update":
                         emitWsEvent('game:lobby_state_update', message);
                         break;
                     default:
@@ -137,17 +132,18 @@ const connectWebSocket = (lobbyId) => {
                         emitWsEvent(`game:${message.event}`, message);
                 }
             }
+            // Эта секция `else if` для `game:move_made` - если она все еще нужна,
+            // убедитесь, что бэкенд не отправляет `lobby_state_update` сразу после `move_made`,
+            // чтобы избежать двойных обновлений. В текущем бэкенде `handle_move` отправляет
+            // `lobby_state_update` после каждого хода, поэтому этот `else if` может быть избыточен.
+            // Если бэкенд отправляет `move_made` БЕЗ полного `lobby_state_update`, тогда это нужно.
+            // Но обычно `lobby_state_update` - это самый универсальный вариант.
+            // Если `move_made` событие прилетает в `message.event` (как string),
+            // то оно будет обработано `switch case "move_made"`.
+            // Если оно приходит как отдельное JSON-поле, то логика ниже.
+            // Я бы рекомендовал придерживаться `message.event` для всех типов сообщений.
             else if (message.row !== undefined && message.col !== undefined && message.symbol) {
                 emitWsEvent('game:move_made', message);
-                // После хода может быть обновление состояния доски и игроков (чей ход)
-                if (message.players || message.board_state || message.turn) {
-                    emitWsEvent('game:lobby_state_update', {
-                        state: (message.winner ? 'FINISHED' : 'PLAYING'), // Если игра закончилась, state меняется
-                        players: message.players,
-                        current_turn_symbol: message.turn,
-                        board_state: message.board_state // Только если бэкенд шлет всю доску
-                    });
-                }
             }
         };
 

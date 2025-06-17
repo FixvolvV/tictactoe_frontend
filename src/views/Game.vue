@@ -66,6 +66,14 @@
         <button class="reset-view-btn" @click="resetBoardView">Center View</button>
       </div>
     </div>
+
+    <!-- НОВЫЙ ЭЛЕМЕНТ: Оверлей по окончанию игры - ВЫНЕСЕН ИЗ containerGame -->
+    <div v-if="showEndGameOverlay" class="end-game-overlay">
+      <div class="end-game-message-box">
+        <h2>{{ endGameMessage }}</h2>
+        <button class="btn-continue-lobby" @click="goToLobby">Continue to Lobby</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -87,7 +95,7 @@ import {
 // --- Константы
 const CELL_SIZE = 40;
 const EXPANSION_MARGIN = 5;
-const DRAG_THRESHOLD = 5; // Порог в пикселях для определения начала перетаскивания
+const DRAG_THRESHOLD = 5;
 
 // --- Routing + Store
 const route = useRoute();
@@ -111,6 +119,10 @@ const cells = reactive(new Map());
 const lastMove = ref(null);
 const winLine = ref([]);
 
+// --- Состояние для оверлея конца игры
+const showEndGameOverlay = ref(false);
+const endGameMessage = ref('');
+
 // --- Зум и перемещение доски
 const scale = ref(1);
 const offset = reactive({ x: 0, y: 0 });
@@ -118,23 +130,21 @@ const boardRef = ref(null);
 
 const isPanning = ref(false);
 const lastMousePos = reactive({ x: 0, y: 0 });
-const mouseDownStartPos = reactive({ x: 0, y: 0 }); // Координаты начального нажатия мыши
-const hasDragged = ref(false); // Флаг, был ли Drag (перетаскивание)
+const mouseDownStartPos = reactive({ x: 0, y: 0 });
+const hasDragged = ref(false);
 
-// --- 1. Логика перетаскивания и предотвращения случайных кликов
 const startPan = (e) => {
-  // Начинаем панорамирование только при нажатии левой (0) или средней (1) кнопки мыши
   if (e.button === 0 || e.button === 1) {
     isPanning.value = true;
-    hasDragged.value = false; // Сбрасываем флаг Drag при новом нажатии
+    hasDragged.value = false;
     lastMousePos.x = e.clientX;
     lastMousePos.y = e.clientY;
-    mouseDownStartPos.x = e.clientX; // Запоминаем стартовую позицию для проверки Drag
+    mouseDownStartPos.x = e.clientX;
     mouseDownStartPos.y = e.clientY;
 
     boardRef.value.style.cursor = 'grabbing';
 
-    if (e.button === 1) { // Если средняя кнопка, предотвращаем стандартное автопролистывание
+    if (e.button === 1) {
       e.preventDefault();
     }
   }
@@ -146,12 +156,11 @@ const onPan = (e) => {
   const dx = e.clientX - lastMousePos.x;
   const dy = e.clientY - lastMousePos.y;
 
-  // Если еще не было зафиксировано перетаскивания, проверяем порог
   if (!hasDragged.value) {
     const totalDxFromStart = e.clientX - mouseDownStartPos.x;
     const totalDyFromStart = e.clientY - mouseDownStartPos.y;
     if (Math.abs(totalDxFromStart) > DRAG_THRESHOLD || Math.abs(totalDyFromStart) > DRAG_THRESHOLD) {
-      hasDragged.value = true; // Перемещение превысило порог, это Drag
+      hasDragged.value = true;
     }
   }
 
@@ -162,22 +171,19 @@ const onPan = (e) => {
 };
 
 const endPan = (e) => {
-  if (!isPanning.value) return; // Если не было активно панорамирование, просто выходим
+  if (!isPanning.value) return;
 
   isPanning.value = false;
   if (boardRef.value) {
     boardRef.value.style.cursor = 'grab';
   }
 
-  // Если не было зафиксировано перетаскивания (т.е. перемещение было меньше порога)
-  // И событие пришло от левой кнопки мыши (0), которая обычно генерирует клик
   if (!hasDragged.value && e.button === 0) {
-    handleCellClick(e); // Ручной вызов обработчика клика
+    handleCellClick(e);
   }
-  hasDragged.value = false; // Сбрасываем флаг Drag для следующего взаимодействия
+  hasDragged.value = false;
 };
 
-// Логика зума без изменений
 const onZoom = (e) => {
   e.preventDefault();
   const zoomSpeed = 0.1;
@@ -246,10 +252,9 @@ const getCellStyle = (x, y) => {
   };
 };
 
-// handleCellClick теперь вызывается либо вручную из endPan (для кликов), либо как раньше
-// Но логика проверки drag/panning теперь в endPan, поэтому избыточные проверки убраны.
 const handleCellClick = (e) => {
-  if (!yourTurn.value) return; // Если не наш ход, игнорируем клик
+  if (!yourTurn.value) return;
+  if (showEndGameOverlay.value) return;
 
   const boardElement = boardRef.value;
   if (!boardElement) return;
@@ -279,10 +284,10 @@ const handleCellClick = (e) => {
   const { minX: boundsMinX, maxX: boundsMaxX, minY: boundsMinY, maxY: boundsMaxY } = currentBoardBounds.value;
   if (cellX < boundsMinX || cellX > boundsMaxX ||
       cellY < boundsMinY || cellY > boundsMaxY) {
-    return; // Кликнули вне активной зоны
+    return;
   }
 
-  if (cells.has(key) && cells.get(key).symbol) return; // Ячейка уже занята
+  if (cells.has(key) && cells.get(key).symbol) return;
 
   cells.set(key, { x: cellX, y: cellY, symbol: playerSymbol.value });
   lastMove.value = { x: cellX, y: cellY };
@@ -313,7 +318,7 @@ const isWinningCell = (x, y) => {
 const toggleReady = () => sendReady();
 const leaveLobby = () => {
   sendLeave();
-  disconnectWebSocket();
+  disconnectWebSocket(); // Отключаемся перед уходом
   router.push("/lobby");
 };
 
@@ -341,6 +346,8 @@ const handleGameStart = ({ symbol }) => {
   offset.x = 0;
   offset.y = 0;
   scale.value = 1;
+  showEndGameOverlay.value = false;
+  endGameMessage.value = '';
 };
 
 const handleMoveMade = (msg) => {
@@ -352,11 +359,15 @@ const handleMoveMade = (msg) => {
 const handleGameWin = (msg) => {
   if (!msg || !Array.isArray(msg.win_line)) return;
   winLine.value = msg.win_line;
+  endGameMessage.value = "You Win!";
+  showEndGameOverlay.value = true;
 };
 
 const handleGameLose = (msg) => {
   if (!msg || !Array.isArray(msg.win_line)) return;
   winLine.value = msg.win_line;
+  endGameMessage.value = "You Lose!";
+  showEndGameOverlay.value = true;
 };
 
 const handleLobbyStateUpdate = (msg) => {
@@ -375,6 +386,9 @@ const handleLobbyStateUpdate = (msg) => {
 };
 
 const handleWsDisconnected = (event) => {
+  // Если отключились не по собственной инициативе (код 1000 - нормальное закрытие)
+  // И текущий путь не /lobby (т.е. мы еще в игре)
+  // Тогда перенаправляем в /lobby, иначе это было ожидаемое отключение.
   if (event.code !== 1000 && router.currentRoute.value.path !== '/lobby') {
     router.push('/lobby');
   }
@@ -386,6 +400,22 @@ const resetBoardView = () => {
   scale.value = 1;
 };
 
+const goToLobby = () => {
+  cells.clear();
+  lastMove.value = null;
+  winLine.value = [];
+  playerSymbol.value = null;
+  currentTurnSymbol.value = null;
+  showEndGameOverlay.value = false;
+  endGameMessage.value = '';
+  offset.x = 0;
+  offset.y = 0;
+  scale.value = 1;
+
+  disconnectWebSocket(); // Отключаемся от WebSocket
+  router.push("/lobby"); // Перенаправляем в лобби
+};
+
 onMounted(() => {
   const lobbyId = route.params.id;
   if (!lobbyId) {
@@ -393,6 +423,7 @@ onMounted(() => {
     return;
   }
   connectWebSocket(lobbyId);
+  // ОБНОВЛЕНИЕ: Подписываемся на новое имя события "game:joined"
   onWsEvent("game:joined", handleGameJoined);
   onWsEvent("game:start", handleGameStart);
   onWsEvent("game:move_made", handleMoveMade);
@@ -420,7 +451,6 @@ onBeforeUnmount(() => {
   disconnectWebSocket();
 });
 </script>
-
 <style scoped>
 /* Импортируем твои стили */
 @import url(../css/game.css);
