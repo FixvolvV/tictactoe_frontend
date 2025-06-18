@@ -60,7 +60,7 @@ const fetchProfile = async (userId) => {
         if (userId === null) {
             response.value = await api.get(`/user/`);
         } else {
-            response.value = await api.get(`/user/${userId}`);
+            response.value = await api.get(`/user/${userId}/`);
         }
 
         profileData.value = response.value.data;

@@ -53,7 +53,7 @@ onMounted(async () => {
   onSseEvent('sse:error', handleSseError);
 
   if (authStore.isLoggedIn) {
-    connectSse('/lobby/all/wait'); // <-- Эндпоинт для получения списка лобби через SSE
+    connectSse('/lobby/all/wait/'); // <-- Эндпоинт для получения списка лобби через SSE
   }
 });
 
