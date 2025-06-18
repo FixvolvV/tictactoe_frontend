@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/auth.js'; // Используем useAut
 import router from '../route/router.js'; // Правильный импорт роутера
 import { useUiStore } from '../stores/ui.js'; // Для открытия модалки логина
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

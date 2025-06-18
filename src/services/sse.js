@@ -7,7 +7,7 @@ import router from '../route/router.js';
 // Используем полифил, который позволяет отправлять заголовки
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
-const SSE_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const SSE_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 let eventSourceInstance = null; // Для хранения экземпляра EventSourcePolyfill
 let abortController = null; // Для управления отменой запроса fetch
