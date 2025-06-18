@@ -63,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
     userLoading.value = true;
     userError.value = null;
     try {
-      const response = await api.get('/user/');
+      const response = await api.get('/user');
       _user.value = response.data;
       localStorage.setItem('userdata', JSON.stringify(response.data));
     } catch (err) {
@@ -87,7 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     error.value = null;
     try {
-      const response = await api.post('/authentication/register/', credentials);
+      const response = await api.post('/authentication/register', credentials);
       const { access_token, refresh_token } = response.data;
       _setAuthTokens(access_token, refresh_token); // Только устанавливаем токены
       loading.value = false;
@@ -103,7 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     error.value = null;
     try {
-      const response = await api.post('/authentication/login/', credentials);
+      const response = await api.post('/authentication/login', credentials);
       const { access_token, refresh_token } = response.data;
       _setAuthTokens(access_token, refresh_token); // Только устанавливаем токены
       loading.value = false;
@@ -119,7 +119,7 @@ export const useAuthStore = defineStore('auth', () => {
     const uiStore = useUiStore();
     uiStore.closeAllModals();
     router.push("/")
-    await api.post('/authentication/logout/');
+    await api.post('/authentication/logout');
     _setAuthTokens(null, null); // Очищаем токены (это также очистит профиль)
     localStorage.clear(); // Очищаем весь localStorage (токены и кэш профиля)
     disconnectWebSocket(); // Отключаем WebSocket при выходе
@@ -134,7 +134,7 @@ export const useAuthStore = defineStore('auth', () => {
       return false;
     }
     try {
-      const response = await api.post('/authentication/refresh/', {}, {
+      const response = await api.post('/authentication/refresh', {}, {
         useRefreshTokenHeader: true
       });
       const { access_token, refresh_token } = response.data;
